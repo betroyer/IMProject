@@ -37,8 +37,8 @@ function is_admin(array $user): bool { return $user['role'] === 'Administrator';
 
 function permission_level(array $user, string $module): string
 {
-    if (is_admin($user)) return $module === 'accounting' ? 'view' : 'edit';
-    $defaults = ['setup'=>'view','plan'=>'edit','notifications'=>'edit','accounting'=>'edit','payments'=>'edit','rewards'=>'edit','content'=>'view','users'=>'edit','performance'=>'view','support'=>'edit'];
+    if (is_admin($user)) return in_array($module, ['content','users','performance','notifications','support'], true) ? 'edit' : 'none';
+    $defaults = ['setup'=>'view','plan'=>'edit','goals'=>'edit','accounting'=>'edit','reports'=>'view','notifications'=>'view','support'=>'edit'];
     return $user['permissions'][$module] ?? ($defaults[$module] ?? 'none');
 }
 

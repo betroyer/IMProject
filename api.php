@@ -3,6 +3,8 @@ declare(strict_types=1);
 require __DIR__ . '/auth.php';
 $user=require_login(true);
 $tables=[
+'plan'=>['table'=>'business_plans','fields'=>['section','title','details','status'],'owned'=>true],
+'goals'=>['table'=>'goals','fields'=>['title','objective','target_date','progress','status'],'owned'=>true],
 'accounting'=>['table'=>'transactions','fields'=>['reference','customer','type','amount','category','status','transaction_date'],'owned'=>true],
 'payments'=>['table'=>'payments','fields'=>['reference','customer','method','amount','status'],'owned'=>true],
 'notifications'=>['table'=>'notifications','fields'=>['title','message','audience','channel','status'],'owned'=>true],
@@ -14,11 +16,19 @@ function tenant_clause(array $user,bool $owned,array &$params):string{if(!$owned
 try{
 $pdo=db();$resource=$_GET['resource']??'dashboard';$method=$_SERVER['REQUEST_METHOD'];
 if($resource==='me')json_response(['ok'=>true,'user'=>$user]);
+if($resource==='reports'){
+require_permission($user,'reports','view');$org=(int)$user['organization_id'];
+$stmt=$pdo->prepare("SELECT type,category,SUM(amount) total FROM transactions WHERE organization_id=? AND status='Paid' GROUP BY type,category");$stmt->execute([$org]);$rows=$stmt->fetchAll();$income=0;$expenses=0;foreach($rows as $row){if($row['type']==='Income')$income+=(float)$row['total'];else $expenses+=(float)$row['total'];}
+json_response(['ok'=>true,'summary'=>['income'=>$income,'expenses'=>$expenses,'net_income'=>$income-$expenses,'owner_equity'=>$income-$expenses],'breakdown'=>$rows]);}
+if($resource==='profile'){
+require_permission($user,'setup','view');$org=(int)($user['organization_id']??1);
+if($method==='GET'){$stmt=$pdo->prepare('SELECT business_name,owner_name,industry,email,phone,address,setup_progress FROM business_profile WHERE organization_id=? LIMIT 1');$stmt->execute([$org]);json_response(['ok'=>true,'profile'=>$stmt->fetch()]);}
+$input=json_decode(file_get_contents('php://input'),true)?:[];$fields=['business_name','owner_name','industry','email','phone','address'];$data=array_intersect_key($input,array_flip($fields));if(!$data)json_response(['ok'=>false,'message'=>'Enter your business details.'],422);$sets=array_map(fn($f)=>"`$f`=:$f",array_keys($data));$data['organization_id']=$org;$stmt=$pdo->prepare('UPDATE business_profile SET '.implode(',',$sets).',setup_progress=100 WHERE organization_id=:organization_id');$stmt->execute($data);json_response(['ok'=>true,'message'=>'Business profile saved.']);}
 if($resource==='permissions'){
 if(!is_admin($user))json_response(['ok'=>false,'message'=>'Only administrators can change permissions.'],403);
 $input=json_decode(file_get_contents('php://input'),true)?:[];$id=(int)($input['id']??0);$permissions=$input['permissions']??[];
 if($method!=='PATCH'||!$id||!is_array($permissions))json_response(['ok'=>false,'message'=>'Invalid permission update.'],422);
-$allowed=['setup','plan','notifications','accounting','payments','rewards','content','users','performance','support'];$clean=[];
+$allowed=['setup','plan','goals','notifications','accounting','reports','content','users','performance','support'];$clean=[];
 foreach($permissions as $module=>$level)if(in_array($module,$allowed,true)&&in_array($level,['none','view','edit'],true))$clean[$module]=$level;
 $stmt=$pdo->prepare("UPDATE users SET permissions=? WHERE id=? AND role!='Administrator'");$stmt->execute([json_encode($clean),$id]);json_response(['ok'=>true,'message'=>'Permissions updated.']);}
 if($resource==='dashboard'){

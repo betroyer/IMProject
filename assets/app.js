@@ -40,6 +40,8 @@ const title = (key) =>
     dashboard: 'Overview',
     setup: 'Setup Guide',
     plan: 'Business Plan Guide',
+    goals: 'Goals & Objectives',
+    reports: 'Accounting Reports',
     notifications: 'Notifications & Announcements',
     accounting: 'Accounting System',
     payments: 'Flexible Payments',
@@ -50,6 +52,9 @@ const title = (key) =>
     support: 'Support Management',
   })[key];
 const descriptions = {
+  plan: 'Write and update the plan for your own business.',
+  goals: 'Set measurable objectives and track progress toward them.',
+  reports: 'Review your income statement, cash flow, balance, and owner equity.',
   notifications: 'Keep customers informed across every channel.',
   accounting: 'Track income, expenses, invoices, and cash flow.',
   payments: 'Manage payment options and payment status.',
@@ -60,15 +65,22 @@ const descriptions = {
 };
 const signedUser = window.CURRENT_USER || {};
 const clientDefaults = {
-  setup: 'view', plan: 'edit', notifications: 'edit', accounting: 'edit',
-  payments: 'edit', rewards: 'edit', content: 'view', users: 'edit',
-  performance: 'view', support: 'edit', dashboard: 'view',
+  setup: 'view', plan: 'edit', goals: 'edit', notifications: 'view', accounting: 'edit',
+  reports: 'view', support: 'edit',
 };
 function accessLevel(module) {
-  if (signedUser.role === 'Administrator') return module === 'accounting' ? 'view' : 'edit';
+  if (signedUser.role === 'Administrator') return ['content','users','performance','notifications','support'].includes(module) ? 'edit' : 'none';
   return signedUser.permissions?.[module] || clientDefaults[module] || 'none';
 }
 const configs = {
+  plan: {
+    columns: ['section','title','details','status','updated_at'],
+    fields: { section:'text', title:'text', details:'textarea', status:['Draft','In progress','Complete'] },
+  },
+  goals: {
+    columns: ['title','objective','target_date','progress','status'],
+    fields: { title:'text', objective:'textarea', target_date:'date', progress:'number', status:['Not started','In progress','Complete'] },
+  },
   accounting: {
     columns: [
       'reference',
@@ -140,7 +152,7 @@ const configs = {
       email: 'email',
       password: 'password',
       organization_id: 'number',
-      role: ['Client', 'Manager', 'Staff', 'Viewer', 'Administrator'],
+      role: ['Client', 'Administrator'],
       status: ['Active', 'Invited', 'Disabled'],
     },
   },
@@ -185,7 +197,7 @@ async function renderDashboard() {
     showDatabaseError(e);
   }
 }
-function renderSetup() {
+async function renderSetup() {
   const tasks = [
     'Complete your business profile',
     'Add your first team member',
@@ -194,8 +206,9 @@ function renderSetup() {
     'Publish a customer guide',
     'Set up a loyalty reward',
   ];
-  const saved = JSON.parse(localStorage.getItem('startup-checklist') || '[]');
-  app.innerHTML = `${pageHead('setup')}<section class="setup-layout"><article class="panel setup-intro"><h2>Get ready for day-to-day work</h2><p>Complete these areas in any order. Each link takes you directly to the right part of your workspace.</p><div class="setup-links">${[
+  if (signedUser.role === 'Administrator') { app.innerHTML=`${pageHead('setup')}<article class="panel empty"><h2>Manage client onboarding</h2><p>Create and publish setup instructions from Content & Guides. Clients only see the steps you make available.</p><button class="button primary" data-go="content">Manage guide content</button></article>`;bindLinks();return; }
+  let profile={}; try{profile=(await request('api.php?resource=profile')).profile||{};}catch(e){showDatabaseError(e);return;}
+  app.innerHTML = `${pageHead('setup')}<section class="setup-layout"><article class="panel profile-editor"><h2>Your business details</h2><p class="panel-sub">Saved securely to your organization.</p><form id="profile-form" class="form-grid"><div class="field"><label>Business name<input name="business_name" required value="${escapeHtml(profile.business_name)}"></label></div><div class="field"><label>Owner name<input name="owner_name" required value="${escapeHtml(profile.owner_name)}"></label></div><div class="field"><label>Industry<input name="industry" required value="${escapeHtml(profile.industry)}"></label></div><div class="field"><label>Email<input type="email" name="email" required value="${escapeHtml(profile.email)}"></label></div><div class="field"><label>Phone<input name="phone" value="${escapeHtml(profile.phone)}"></label></div><div class="field"><label>Business address<input name="address" value="${escapeHtml(profile.address)}"></label></div><div class="field full"><button class="button primary">Save business details</button></div></form></article><article class="panel setup-intro"><h2>Next steps</h2><p>Continue setting up the parts of your business you will use every day.</p><div class="setup-links">${[
     ['users', 'Business details and team'],
     ['payments', 'Payments and accounting'],
     ['rewards', 'Customer rewards'],
@@ -207,19 +220,9 @@ function renderSetup() {
     )
     .join(
       '',
-    )}</div></article><article class="panel checklist-card"><div class="checklist-head"><div><h2>Setup checklist</h2><p class="panel-sub">Saved on this device</p></div><strong>${saved.length} of ${tasks.length}</strong></div><div class="checklist">${tasks.map((t, i) => `<label><input type="checkbox" data-task="${i}" ${saved.includes(i) ? 'checked' : ''}><span>${t}</span></label>`).join('')}</div></article></section>`;
+    )}</div></article></section>`;
   bindLinks();
-  document.querySelectorAll('[data-task]').forEach(
-    (c) =>
-      (c.onchange = () => {
-        const values = [
-          ...document.querySelectorAll('[data-task]:checked'),
-        ].map((x) => Number(x.dataset.task));
-        localStorage.setItem('startup-checklist', JSON.stringify(values));
-        renderSetup();
-        toast('Setup progress saved.');
-      }),
-  );
+  $('#profile-form').onsubmit=async(e)=>{e.preventDefault();const form=e.currentTarget;if(!form.reportValidity())return;try{await request('api.php?resource=profile',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(form)))});toast('Business details saved.');}catch(err){toast(err.message,true)}};
 }
 function renderPlan() {
   const cards = [
@@ -255,6 +258,7 @@ function renderPerformance() {
   }
   app.innerHTML = `${pageHead('performance')}<section class="performance-grid"><article class="panel"><p class="panel-sub">System availability</p><strong>99.98%</strong><small>All systems operational</small></article><article class="panel"><p class="panel-sub">Average response time</p><strong>142 ms</strong><small>18% faster this week</small></article><article class="panel"><p class="panel-sub">Active sessions</p><strong>24</strong><small>Across the platform</small></article><article class="panel"><h2>Feature usage</h2><div class="chart"><div class="bar-wrap"><div class="bar" style="height:88%"></div><small>Payments</small></div><div class="bar-wrap"><div class="bar" style="height:65%"></div><small>Content</small></div><div class="bar-wrap"><div class="bar" style="height:48%"></div><small>Rewards</small></div></div></article><article class="panel" style="grid-column:span 2"><h2>Platform status</h2><p class="panel-sub">Database, payment records, notification delivery, and account services are healthy.</p><div class="checklist"><label>Database service — Operational</label><label>Payment records — Operational</label><label>Notification service — Operational</label></div></article></section>`;
 }
+async function renderReports(){app.innerHTML='<div class="empty">Preparing reports…</div>';try{const data=await request('api.php?resource=reports');const s=data.summary;app.innerHTML=`${pageHead('reports')}<section class="report-summary"><article><span>Total income</span><strong>${money(s.income)}</strong></article><article><span>Total expenses</span><strong>${money(s.expenses)}</strong></article><article><span>Net income</span><strong>${money(s.net_income)}</strong></article><article><span>Owner equity</span><strong>${money(s.owner_equity)}</strong></article></section><article class="panel report-sheet"><header><div><h2>Income statement</h2><p class="panel-sub">Paid transactions grouped by category</p></div><time>${new Date().toLocaleDateString()}</time></header><table><thead><tr><th>Type</th><th>Category</th><th>Amount</th></tr></thead><tbody>${data.breakdown.map(r=>`<tr><td>${escapeHtml(r.type)}</td><td>${escapeHtml(r.category)}</td><td>${money(r.total)}</td></tr>`).join('')}</tbody></table></article>`;}catch(e){showDatabaseError(e)}}
 async function renderResource(view) {
   app.innerHTML = '<div class="empty">Loading records…</div>';
   try {
@@ -273,7 +277,7 @@ async function renderResource(view) {
   }
 }
 function openPermissions(user) {
-  const modules = ['setup','plan','notifications','accounting','payments','rewards','content','users','performance','support'];
+  const modules = ['setup','plan','goals','notifications','accounting','payments','rewards','content','users','performance','support'];
   const saved = typeof user.permissions === 'string' ? JSON.parse(user.permissions || '{}') : (user.permissions || {});
   $('#dialog-title').textContent = `Permissions for ${user.name}`;
   $('#form-fields').innerHTML = modules.map((module) => { const level=saved[module]||clientDefaults[module]; return `<div class="field"><label for="p-${module}">${title(module)}</label><select id="p-${module}" name="${module}"><option value="none" ${level==='none'?'selected':''}>No access</option><option value="view" ${level==='view'?'selected':''}>View only</option><option value="edit" ${level==='edit'?'selected':''}>View and edit</option></select></div>`; }).join('');
@@ -345,7 +349,7 @@ function bindLinks() {
     .forEach((b) => (b.onclick = () => navigate(b.dataset.go)));
 }
 function navigate(view) {
-  if (view !== 'dashboard' && accessLevel(view) === 'none') { toast('You do not have access to this section.', true); return; }
+  if (accessLevel(view) === 'none') { toast('You do not have access to this section.', true); return; }
   currentView = view;
   document
     .querySelectorAll('.nav-item')
@@ -355,7 +359,8 @@ function navigate(view) {
   history.replaceState(null, '', `#${view}`);
   if (view === 'dashboard') renderDashboard();
   else if (view === 'setup') renderSetup();
-  else if (view === 'plan') renderPlan();
+  else if (view === 'plan' || view === 'goals') renderResource(view);
+  else if (view === 'reports') renderReports();
   else if (view === 'performance') renderPerformance();
   else renderResource(view);
 }
@@ -383,8 +388,4 @@ $('#global-search').addEventListener('input', (e) => {
       (row) => (row.hidden = !row.textContent.toLowerCase().includes(q)),
     );
 });
-navigate(
-  location.hash.slice(1) && title(location.hash.slice(1))
-    ? location.hash.slice(1)
-    : 'dashboard',
-);
+const requestedView=location.hash.slice(1);const defaultView=signedUser.role==='Administrator'?'content':'setup';navigate(requestedView&&title(requestedView)&&accessLevel(requestedView)!=='none'?requestedView:defaultView);
