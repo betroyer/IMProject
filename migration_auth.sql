@@ -11,6 +11,7 @@ INSERT IGNORE INTO organizations (id,name,status) VALUES (1,'Northstar Studio','
 ALTER TABLE users MODIFY role ENUM('Administrator','Client','Manager','Staff','Viewer') NOT NULL DEFAULT 'Client';
 ALTER TABLE users ADD COLUMN IF NOT EXISTS organization_id INT NULL AFTER id;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255) NULL AFTER email;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password TEXT NULL AFTER password_hash;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS permissions JSON NULL AFTER status;
 UPDATE users SET organization_id=1 WHERE organization_id IS NULL AND role!='Administrator';
 

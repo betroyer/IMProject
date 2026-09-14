@@ -36,6 +36,7 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
+/.doc_work/
 
 # machine-local Codex and design-tool state
 /.codex/

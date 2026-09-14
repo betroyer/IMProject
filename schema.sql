@@ -1,35 +1,43 @@
 CREATE DATABASE IF NOT EXISTS startup_bms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE startup_bms;
 
+CREATE TABLE IF NOT EXISTS organizations (
+  id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(140) NOT NULL,
+  status ENUM('Active','Suspended') NOT NULL DEFAULT 'Active', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS business_profile (
-  id INT PRIMARY KEY AUTO_INCREMENT, business_name VARCHAR(120) NOT NULL,
+  id INT PRIMARY KEY AUTO_INCREMENT, organization_id INT NOT NULL DEFAULT 1, business_name VARCHAR(120) NOT NULL,
   owner_name VARCHAR(120) NOT NULL, industry VARCHAR(100) NOT NULL,
-  email VARCHAR(160) NOT NULL, setup_progress TINYINT UNSIGNED NOT NULL DEFAULT 20,
+  email VARCHAR(160) NOT NULL, phone VARCHAR(40) NULL, address VARCHAR(220) NULL,
+  setup_progress TINYINT UNSIGNED NOT NULL DEFAULT 20,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS users (
-  id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(120) NOT NULL, email VARCHAR(160) UNIQUE NOT NULL,
-  role ENUM('Administrator','Manager','Staff','Viewer') NOT NULL DEFAULT 'Staff',
-  status ENUM('Active','Invited','Disabled') NOT NULL DEFAULT 'Active', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  id INT PRIMARY KEY AUTO_INCREMENT, organization_id INT NULL, name VARCHAR(120) NOT NULL,
+  email VARCHAR(160) UNIQUE NOT NULL, password TEXT NULL, password_hash VARCHAR(255) NULL,
+  role ENUM('Administrator','Client','Manager','Staff','Viewer') NOT NULL DEFAULT 'Client',
+  status ENUM('Active','Invited','Disabled') NOT NULL DEFAULT 'Active', permissions JSON NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS transactions (
-  id INT PRIMARY KEY AUTO_INCREMENT, reference VARCHAR(30) UNIQUE NOT NULL, customer VARCHAR(120) NOT NULL,
+  id INT PRIMARY KEY AUTO_INCREMENT, organization_id INT NOT NULL DEFAULT 1, reference VARCHAR(30) UNIQUE NOT NULL, customer VARCHAR(120) NOT NULL,
   type ENUM('Income','Expense') NOT NULL, amount DECIMAL(12,2) NOT NULL, category VARCHAR(80) NOT NULL,
   status ENUM('Paid','Pending','Overdue') NOT NULL DEFAULT 'Pending', transaction_date DATE NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS payments (
-  id INT PRIMARY KEY AUTO_INCREMENT, reference VARCHAR(30) UNIQUE NOT NULL, customer VARCHAR(120) NOT NULL,
+  id INT PRIMARY KEY AUTO_INCREMENT, organization_id INT NOT NULL DEFAULT 1, reference VARCHAR(30) UNIQUE NOT NULL, customer VARCHAR(120) NOT NULL,
   method ENUM('GCash','Maya','Bank Transfer','Cash','Card') NOT NULL, amount DECIMAL(12,2) NOT NULL,
   status ENUM('Completed','Pending','Failed') NOT NULL DEFAULT 'Pending', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS notifications (
-  id INT PRIMARY KEY AUTO_INCREMENT, title VARCHAR(150) NOT NULL, message TEXT NOT NULL,
+  id INT PRIMARY KEY AUTO_INCREMENT, organization_id INT NULL, title VARCHAR(150) NOT NULL, message TEXT NOT NULL,
   audience VARCHAR(80) NOT NULL DEFAULT 'All customers', channel ENUM('Email','SMS','In-app') NOT NULL DEFAULT 'In-app',
   status ENUM('Draft','Scheduled','Sent') NOT NULL DEFAULT 'Draft', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS rewards (
-  id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(120) NOT NULL, points INT UNSIGNED NOT NULL,
+  id INT PRIMARY KEY AUTO_INCREMENT, organization_id INT NOT NULL DEFAULT 1, name VARCHAR(120) NOT NULL, points INT UNSIGNED NOT NULL,
   redemptions INT UNSIGNED NOT NULL DEFAULT 0, status ENUM('Active','Paused') NOT NULL DEFAULT 'Active', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS contents (
@@ -37,17 +45,31 @@ CREATE TABLE IF NOT EXISTS contents (
   status ENUM('Draft','Published','Archived') NOT NULL DEFAULT 'Draft', updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS support_tickets (
-  id INT PRIMARY KEY AUTO_INCREMENT, subject VARCHAR(160) NOT NULL, customer VARCHAR(120) NOT NULL,
+  id INT PRIMARY KEY AUTO_INCREMENT, organization_id INT NOT NULL DEFAULT 1, subject VARCHAR(160) NOT NULL, customer VARCHAR(120) NOT NULL,
   priority ENUM('Low','Medium','High') NOT NULL DEFAULT 'Medium', status ENUM('Open','In progress','Resolved') NOT NULL DEFAULT 'Open',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE IF NOT EXISTS business_plans (
+  id INT PRIMARY KEY AUTO_INCREMENT, organization_id INT NOT NULL,
+  section VARCHAR(100) NOT NULL, title VARCHAR(160) NOT NULL, details TEXT NOT NULL,
+  status ENUM('Draft','In progress','Complete') NOT NULL DEFAULT 'Draft',
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS goals (
+  id INT PRIMARY KEY AUTO_INCREMENT, organization_id INT NOT NULL,
+  title VARCHAR(160) NOT NULL, objective TEXT NOT NULL, target_date DATE NOT NULL,
+  progress TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  status ENUM('Not started','In progress','Complete') NOT NULL DEFAULT 'Not started',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
+INSERT IGNORE INTO organizations (id,name,status) VALUES (1,'Northstar Studio','Active');
 INSERT INTO business_profile (business_name,owner_name,industry,email,setup_progress)
 SELECT 'Northstar Studio','Jamie Dela Cruz','Digital Services','hello@northstar.ph',82
 WHERE NOT EXISTS (SELECT 1 FROM business_profile);
-INSERT IGNORE INTO users (id,name,email,role,status) VALUES
-(1,'Jamie Dela Cruz','jamie@northstar.ph','Administrator','Active'),
-(2,'Alex Santos','alex@northstar.ph','Manager','Active'),(3,'Mia Reyes','mia@northstar.ph','Staff','Invited');
+INSERT IGNORE INTO users (id,organization_id,name,email,role,status,permissions) VALUES
+(1,NULL,'Jamie Dela Cruz','jamie@northstar.ph','Administrator','Active','{}'),
+(2,1,'Alex Santos','alex@northstar.ph','Client','Active','{"setup":"view","plan":"edit","goals":"edit","accounting":"edit","reports":"view","notifications":"view","support":"edit"}');
 INSERT IGNORE INTO transactions (id,reference,customer,type,amount,category,status,transaction_date) VALUES
 (1,'INV-2048','Acme Retail','Income',18500,'Sales','Paid',CURDATE()),
 (2,'INV-2049','Northstar Coffee Co.','Income',12600,'Services','Pending',CURDATE()),
