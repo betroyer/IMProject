@@ -415,14 +415,22 @@ document.querySelectorAll('.nav-item').forEach((b) => {
 document
   .querySelectorAll('[data-inline-icon]')
   .forEach((el) => (el.innerHTML = icon(el.dataset.inlineIcon)));
-$('.menu-toggle').onclick = () => {
-  $('#sidebar').classList.add('open');
-  $('.scrim').classList.add('show');
-};
-$('.close-menu').onclick = $('.scrim').onclick = () => {
-  $('#sidebar').classList.remove('open');
-  $('.scrim').classList.remove('show');
-};
+bindLinks();
+const menuToggle = $('.menu-toggle');
+const closeMenu = $('.close-menu');
+const scrim = $('.scrim');
+if (menuToggle) {
+  menuToggle.onclick = () => {
+    $('#sidebar').classList.add('open');
+    scrim?.classList.add('show');
+  };
+}
+if (closeMenu && scrim) {
+  closeMenu.onclick = scrim.onclick = () => {
+    $('#sidebar').classList.remove('open');
+    scrim.classList.remove('show');
+  };
+}
 $('#global-search').addEventListener('input', (e) => {
   const q = e.target.value.toLowerCase();
   document
