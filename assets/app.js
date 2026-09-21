@@ -32,6 +32,9 @@ const icon = (name) => {
     activity: '<path d="M3 12h4l2-7 4 14 2-7h6"/>',
     support:
       '<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.4 2.33c-.9.39-.9 1.17-.9 1.67M12 17h.01"/>',
+    invoice:
+      '<path d="M7 3h8l4 4v14H7zM14 3v5h5M9 12h8M9 16h6"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   };
   return `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${p[name] || p.file}</svg>`;
 };
@@ -52,6 +55,8 @@ const title = (key) =>
     support: 'Support Management',
   })[key];
 const descriptions = {
+  dashboard: 'See revenue, customers, and the work that needs attention today.',
+  setup: 'Finish the essentials so your workspace matches how you operate.',
   plan: 'Write and update the plan for your own business.',
   goals: 'Set measurable objectives and track progress toward them.',
   reports: 'Review your income statement, cash flow, balance, and owner equity.',
@@ -61,6 +66,7 @@ const descriptions = {
   rewards: 'Create benefits that keep customers coming back.',
   content: 'Publish helpful guides and business updates.',
   users: 'Control team access, roles, and account status.',
+  performance: 'Monitor usage and health for the areas you can access.',
   support: 'Resolve customer requests from one organized queue.',
 };
 const signedUser = window.CURRENT_USER || {};
@@ -184,14 +190,44 @@ function pageHead(view, action = '') {
   return `<div class="page-head"><div><h1>${title(view)}</h1><p>${descriptions[view] || 'Build a stronger foundation for your business.'}</p></div>${action}</div>`;
 }
 async function renderDashboard() {
-  app.innerHTML = '<div class="empty">Loading your business…</div>';
+  app.innerHTML = '<div class="empty loading-state">Loading your business…</div>';
   try {
     const { metrics, profile, activity } = await request(
       'api.php?resource=dashboard',
     );
     const months = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
       heights = [38, 52, 46, 70, 61, 88];
-    app.innerHTML = `${pageHead('dashboard', '<button class="button primary" data-go="accounting">+ Create invoice</button>')}<section class="metrics"><article class="metric"><span class="metric-icon">₱</span><p>Revenue this month</p><strong>${money(metrics.revenue)}</strong><small>Paid income recorded</small></article><article class="metric"><span class="metric-icon">♙</span><p>Active customers</p><strong>${metrics.customers}</strong><small>Across all transactions</small></article><article class="metric"><span class="metric-icon">▰</span><p>Pending invoices</p><strong>${metrics.pending}</strong><small>Awaiting settlement</small></article><article class="metric"><span class="metric-icon">?</span><p>Open support tickets</p><strong>${metrics.tickets}</strong><small>Needs your attention</small></article></section><section class="dashboard-grid"><article class="panel"><h2>Revenue overview</h2><p class="panel-sub">Six-month performance snapshot</p><div class="chart">${months.map((m, i) => `<div class="bar-wrap"><div class="bar" style="height:${heights[i]}%"></div><small>${m}</small></div>`).join('')}</div></article><article class="panel"><h2>Quick actions</h2><p class="panel-sub">Common tasks, one click away</p><div class="quick-list"><button data-go="accounting"><span>₱</span>Create invoice<b>›</b></button><button data-go="users"><span>♙</span>Add team member<b>›</b></button><button data-go="notifications"><span>♢</span>Publish announcement<b>›</b></button><button data-go="setup"><span>✓</span>Continue setup<b>›</b></button></div></article><article class="panel activity-panel"><h2>Recent activity</h2><p class="panel-sub">Latest updates across your workspace</p><div class="activity-list">${activity.map((a) => `<div class="activity-row"><i>✓</i><div><strong>${escapeHtml(a.title)}</strong><p>${escapeHtml(a.detail)}</p></div><time>${new Date(a.created_at).toLocaleDateString()}</time></div>`).join('') || '<div class="empty">No activity yet.</div>'}</div></article><article class="panel health"><h2>Business health</h2><p class="panel-sub">Your setup progress</p><div class="progress-ring" style="--progress:${profile?.setup_progress || 0}" data-value="${profile?.setup_progress || 0}%"></div><p>Complete your startup checklist to improve your business health score.</p><button class="button secondary" data-go="setup">Continue setup</button></article></section>`;
+    const progress = Number(profile?.setup_progress || 0);
+    const activityRows =
+      activity.map(
+        (a) =>
+          `<div class="activity-row"><i>${icon('check')}</i><div><strong>${escapeHtml(a.title)}</strong><p>${escapeHtml(a.detail)}</p></div><time>${new Date(a.created_at).toLocaleDateString()}</time></div>`,
+      ).join('') || '<div class="empty">No activity yet.</div>';
+    app.innerHTML = `${pageHead('dashboard', '<button class="button primary" data-go="accounting">Create invoice</button>')}
+<section class="metrics">
+  <article class="metric"><span class="metric-icon">${icon('wallet')}</span><p>Revenue this month</p><strong>${money(metrics.revenue)}</strong><small>Paid income recorded</small></article>
+  <article class="metric"><span class="metric-icon">${icon('users')}</span><p>Active customers</p><strong>${metrics.customers}</strong><small>Across all transactions</small></article>
+  <article class="metric"><span class="metric-icon">${icon('invoice')}</span><p>Pending invoices</p><strong>${metrics.pending}</strong><small>Awaiting settlement</small></article>
+  <article class="metric"><span class="metric-icon">${icon('support')}</span><p>Open support tickets</p><strong>${metrics.tickets}</strong><small>Needs your attention</small></article>
+</section>
+<section class="dashboard-grid">
+  <article class="panel"><h2>Revenue overview</h2><p class="panel-sub">Six-month performance snapshot</p><div class="chart">${months.map((m, i) => `<div class="bar-wrap"><div class="bar" style="height:${heights[i]}%"></div><small>${m}</small></div>`).join('')}</div></article>
+  <article class="panel"><h2>Quick actions</h2><p class="panel-sub">Common tasks, one click away</p><div class="quick-list">
+    <button data-go="accounting"><span>${icon('invoice')}</span>Create invoice<b aria-hidden="true">›</b></button>
+    <button data-go="users"><span>${icon('users')}</span>Add team member<b aria-hidden="true">›</b></button>
+    <button data-go="notifications"><span>${icon('bell')}</span>Publish announcement<b aria-hidden="true">›</b></button>
+    <button data-go="setup"><span>${icon('check')}</span>Continue setup<b aria-hidden="true">›</b></button>
+  </div></article>
+  <article class="panel activity-panel"><h2>Recent activity</h2><p class="panel-sub">Latest updates across your workspace</p><div class="activity-list">${activityRows}</div></article>
+  <article class="panel health"><h2>Setup progress</h2><p class="panel-sub">Finish onboarding to unlock a complete workspace</p>
+    <div class="setup-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress}" aria-label="Setup progress">
+      <div class="setup-progress-track"><div class="setup-progress-fill" style="transform:scaleX(${Math.max(progress, 0) / 100})"></div></div>
+      <strong>${progress}% complete</strong>
+    </div>
+    <p>Complete your startup checklist to keep operations, payments, and support aligned.</p>
+    <button class="button secondary" data-go="setup">Continue setup</button>
+  </article>
+</section>`;
     bindLinks();
   } catch (e) {
     showDatabaseError(e);
@@ -208,15 +244,15 @@ async function renderSetup() {
   ];
   if (signedUser.role === 'Administrator') { app.innerHTML=`${pageHead('setup')}<article class="panel empty"><h2>Manage client onboarding</h2><p>Create and publish setup instructions from Content & Guides. Clients only see the steps you make available.</p><button class="button primary" data-go="content">Manage guide content</button></article>`;bindLinks();return; }
   let profile={}; try{profile=(await request('api.php?resource=profile')).profile||{};}catch(e){showDatabaseError(e);return;}
-  app.innerHTML = `${pageHead('setup')}<section class="setup-layout"><article class="panel profile-editor"><h2>Your business details</h2><p class="panel-sub">Saved securely to your organization.</p><form id="profile-form" class="form-grid"><div class="field"><label>Business name<input name="business_name" required value="${escapeHtml(profile.business_name)}"></label></div><div class="field"><label>Owner name<input name="owner_name" required value="${escapeHtml(profile.owner_name)}"></label></div><div class="field"><label>Industry<input name="industry" required value="${escapeHtml(profile.industry)}"></label></div><div class="field"><label>Email<input type="email" name="email" required value="${escapeHtml(profile.email)}"></label></div><div class="field"><label>Phone<input name="phone" value="${escapeHtml(profile.phone)}"></label></div><div class="field"><label>Business address<input name="address" value="${escapeHtml(profile.address)}"></label></div><div class="field full"><button class="button primary">Save business details</button></div></form></article><article class="panel setup-intro"><h2>Next steps</h2><p>Continue setting up the parts of your business you will use every day.</p><div class="setup-links">${[
-    ['users', 'Business details and team'],
-    ['payments', 'Payments and accounting'],
-    ['rewards', 'Customer rewards'],
-    ['content', 'Guides and announcements'],
+  app.innerHTML = `${pageHead('setup')}<section class="setup-layout"><article class="panel profile-editor"><h2>Your business details</h2><p class="panel-sub">Saved securely to your organization.</p><form id="profile-form" class="form-grid"><div class="field"><label>Business name<input name="business_name" required value="${escapeHtml(profile.business_name)}"></label></div><div class="field"><label>Owner name<input name="owner_name" required value="${escapeHtml(profile.owner_name)}"></label></div><div class="field"><label>Industry<input name="industry" required value="${escapeHtml(profile.industry)}"></label></div><div class="field"><label>Email<input type="email" name="email" required value="${escapeHtml(profile.email)}"></label></div><div class="field"><label>Phone<input name="phone" value="${escapeHtml(profile.phone)}"></label></div><div class="field"><label>Business address<input name="address" value="${escapeHtml(profile.address)}"></label></div><div class="field full actions"><button class="button primary">Save business details</button></div></form></article><article class="panel setup-intro"><h2>Next steps</h2><p>Continue setting up the parts of your business you will use every day.</p><div class="setup-links">${[
+    ['plan', 'plan', 'Business plan guide'],
+    ['accounting', 'wallet', 'Accounting journal'],
+    ['reports', 'file', 'Accounting reports'],
+    ['support', 'support', 'Help and support'],
   ]
     .map(
       (x) =>
-        `<button data-go="${x[0]}">${icon('check')}<span>${x[1]}</span><b>Open</b></button>`,
+        `<button data-go="${x[0]}">${icon(x[1])}<span>${x[2]}</span><b>Open</b></button>`,
     )
     .join(
       '',
@@ -253,21 +289,28 @@ function renderPlan() {
 }
 function renderPerformance() {
   if (signedUser.role !== 'Administrator') {
-    app.innerHTML = `${pageHead('performance')}<section class="performance-grid"><article class="panel"><p class="panel-sub">Storage used</p><strong>1.6 GB</strong><small>of your 2 GB allowance</small></article><article class="panel"><p class="panel-sub">Team accounts</p><strong>3</strong><small>within your organization</small></article><article class="panel"><p class="panel-sub">Records this month</p><strong>28</strong><small>Your workspace activity</small></article><article class="panel" style="grid-column:span 3"><h2>Your feature usage</h2><p class="panel-sub">Only activity from your organization is shown here.</p><div class="chart"><div class="bar-wrap"><div class="bar" style="height:88%"></div><small>Payments</small></div><div class="bar-wrap"><div class="bar" style="height:65%"></div><small>Accounting</small></div><div class="bar-wrap"><div class="bar" style="height:48%"></div><small>Rewards</small></div></div></article></section>`;
+    app.innerHTML = `${pageHead('performance')}<section class="performance-grid"><article class="panel"><p class="panel-sub">Storage used</p><strong>1.6 GB</strong><small>of your 2 GB allowance</small></article><article class="panel"><p class="panel-sub">Team accounts</p><strong>3</strong><small>within your organization</small></article><article class="panel"><p class="panel-sub">Records this month</p><strong>28</strong><small>Your workspace activity</small></article><article class="panel span-all"><h2>Your feature usage</h2><p class="panel-sub">Only activity from your organization is shown here.</p><div class="chart"><div class="bar-wrap"><div class="bar" style="height:88%"></div><small>Payments</small></div><div class="bar-wrap"><div class="bar" style="height:65%"></div><small>Accounting</small></div><div class="bar-wrap"><div class="bar" style="height:48%"></div><small>Rewards</small></div></div></article></section>`;
     return;
   }
-  app.innerHTML = `${pageHead('performance')}<section class="performance-grid"><article class="panel"><p class="panel-sub">System availability</p><strong>99.98%</strong><small>All systems operational</small></article><article class="panel"><p class="panel-sub">Average response time</p><strong>142 ms</strong><small>18% faster this week</small></article><article class="panel"><p class="panel-sub">Active sessions</p><strong>24</strong><small>Across the platform</small></article><article class="panel"><h2>Feature usage</h2><div class="chart"><div class="bar-wrap"><div class="bar" style="height:88%"></div><small>Payments</small></div><div class="bar-wrap"><div class="bar" style="height:65%"></div><small>Content</small></div><div class="bar-wrap"><div class="bar" style="height:48%"></div><small>Rewards</small></div></div></article><article class="panel" style="grid-column:span 2"><h2>Platform status</h2><p class="panel-sub">Database, payment records, notification delivery, and account services are healthy.</p><div class="checklist"><label>Database service — Operational</label><label>Payment records — Operational</label><label>Notification service — Operational</label></div></article></section>`;
+  app.innerHTML = `${pageHead('performance')}<section class="performance-grid"><article class="panel"><p class="panel-sub">System availability</p><strong>99.98%</strong><small>All systems operational</small></article><article class="panel"><p class="panel-sub">Average response time</p><strong>142 ms</strong><small>18% faster this week</small></article><article class="panel"><p class="panel-sub">Active sessions</p><strong>24</strong><small>Across the platform</small></article><article class="panel"><h2>Feature usage</h2><div class="chart"><div class="bar-wrap"><div class="bar" style="height:88%"></div><small>Payments</small></div><div class="bar-wrap"><div class="bar" style="height:65%"></div><small>Content</small></div><div class="bar-wrap"><div class="bar" style="height:48%"></div><small>Rewards</small></div></div></article><article class="panel span-wide"><h2>Platform status</h2><p class="panel-sub">Database, payment records, notification delivery, and account services are healthy.</p><ul class="status-list"><li><span class="status-dot"></span>Database service — Operational</li><li><span class="status-dot"></span>Payment records — Operational</li><li><span class="status-dot"></span>Notification service — Operational</li></ul></article></section>`;
 }
-async function renderReports(){app.innerHTML='<div class="empty">Preparing reports…</div>';try{const data=await request('api.php?resource=reports');const s=data.summary;app.innerHTML=`${pageHead('reports')}<section class="report-summary"><article><span>Total income</span><strong>${money(s.income)}</strong></article><article><span>Total expenses</span><strong>${money(s.expenses)}</strong></article><article><span>Net income</span><strong>${money(s.net_income)}</strong></article><article><span>Owner equity</span><strong>${money(s.owner_equity)}</strong></article></section><article class="panel report-sheet"><header><div><h2>Income statement</h2><p class="panel-sub">Paid transactions grouped by category</p></div><time>${new Date().toLocaleDateString()}</time></header><table><thead><tr><th>Type</th><th>Category</th><th>Amount</th></tr></thead><tbody>${data.breakdown.map(r=>`<tr><td>${escapeHtml(r.type)}</td><td>${escapeHtml(r.category)}</td><td>${money(r.total)}</td></tr>`).join('')}</tbody></table></article>`;}catch(e){showDatabaseError(e)}}
+async function renderReports(){app.innerHTML='<div class="empty loading-state">Preparing reports…</div>';try{const data=await request('api.php?resource=reports');const s=data.summary;const rows=data.breakdown.length?data.breakdown.map(r=>`<tr><td>${escapeHtml(r.type)}</td><td>${escapeHtml(r.category)}</td><td>${money(r.total)}</td></tr>`).join(''):'<tr><td colspan="3"><div class="empty empty-state"><h2>No paid transactions yet</h2><p>Income and expense totals will appear after you record settled activity.</p></div></td></tr>';app.innerHTML=`${pageHead('reports')}<section class="report-summary"><article><span>Total income</span><strong>${money(s.income)}</strong></article><article><span>Total expenses</span><strong>${money(s.expenses)}</strong></article><article><span>Net income</span><strong>${money(s.net_income)}</strong></article><article><span>Owner equity</span><strong>${money(s.owner_equity)}</strong></article></section><article class="panel report-sheet"><header><div><h2>Income statement</h2><p class="panel-sub">Paid transactions grouped by category</p></div><time>${new Date().toLocaleDateString()}</time></header><table><thead><tr><th>Type</th><th>Category</th><th>Amount</th></tr></thead><tbody>${rows}</tbody></table></article>`;}catch(e){showDatabaseError(e)}}
 async function renderResource(view) {
-  app.innerHTML = '<div class="empty">Loading records…</div>';
+  app.innerHTML = '<div class="empty loading-state">Loading records…</div>';
   try {
     const data = await request(`api.php?resource=${view}`);
     currentItems = data.items;
     const cfg = configs[view];
-    const addAction = data.canEdit ? '<button class="button primary" id="add-record">+ Add record</button>' : '<span class="access-note">View only</span>';
-    app.innerHTML = `${pageHead(view, addAction)}<article class="panel table-card"><div class="table-toolbar"><div><h2>${title(view)} records</h2><p class="panel-sub">${data.items.length} total records</p></div></div><div class="table-wrap">${data.items.length ? `<table><thead><tr>${cfg.columns.map((c) => `<th>${label(c)}</th>`).join('')}<th></th></tr></thead><tbody>${data.items.map((row) => `<tr>${cfg.columns.map((c) => `<td>${cell(c, row[c])}</td>`).join('')}<td class="row-actions">${data.isAdmin && view === 'users' && row.role !== 'Administrator' ? `<button class="permission-link" data-permissions="${row.id}">Permissions</button>` : ''}${data.canEdit && !(view === 'users' && row.role === 'Administrator') ? `<button data-delete="${row.id}">Delete</button>` : ''}</td></tr>`).join('')}</tbody></table>` : '<div class="empty">No records yet.</div>'}</div></article>`;
-    if ($('#add-record')) $('#add-record').onclick = () => openForm(view);
+    const addAction = data.canEdit
+      ? '<button class="button primary" id="add-record">Add record</button>'
+      : '<span class="access-note">View only</span>';
+    const emptyState = data.canEdit
+      ? `<div class="empty empty-state"><h2>No records yet</h2><p>Add the first record to start tracking this part of your business.</p><button class="button primary" id="add-record-empty">Add record</button></div>`
+      : `<div class="empty empty-state"><h2>No records yet</h2><p>Records will appear here when your organization adds them.</p></div>`;
+    app.innerHTML = `${pageHead(view, addAction)}<article class="panel table-card"><div class="table-toolbar"><div><h2>${title(view)}</h2><p class="panel-sub">${data.items.length} total ${data.items.length === 1 ? 'record' : 'records'}</p></div></div><div class="table-wrap">${data.items.length ? `<table><thead><tr>${cfg.columns.map((c) => `<th>${label(c)}</th>`).join('')}<th><span class="sr-only">Actions</span></th></tr></thead><tbody>${data.items.map((row) => `<tr>${cfg.columns.map((c) => `<td>${cell(c, row[c])}</td>`).join('')}<td class="row-actions">${data.isAdmin && view === 'users' && row.role !== 'Administrator' ? `<button class="permission-link" data-permissions="${row.id}">Permissions</button>` : ''}${data.canEdit && !(view === 'users' && row.role === 'Administrator') ? `<button data-delete="${row.id}">Delete</button>` : ''}</td></tr>`).join('')}</tbody></table>` : emptyState}</div></article>`;
+    const openAdd = () => openForm(view);
+    if ($('#add-record')) $('#add-record').onclick = openAdd;
+    if ($('#add-record-empty')) $('#add-record-empty').onclick = openAdd;
     document.querySelectorAll('[data-permissions]').forEach((b) => b.onclick = () => openPermissions(currentItems.find((item) => item.id == b.dataset.permissions)));
     document
       .querySelectorAll('[data-delete]')

@@ -36,7 +36,7 @@
   </aside>
   <button class="scrim" aria-label="Close menu"></button>
   <main>
-    <header class="topbar"><button class="menu-toggle icon-btn" aria-label="Open menu">Menu</button><label class="search"><span aria-hidden="true">Search</span><input id="global-search" placeholder="Search records" aria-label="Search records"></label><span class="role-chip"><?= htmlspecialchars($signedInUser['role']) ?></span><button class="notification-button icon-btn" aria-label="Notifications"><span data-inline-icon="bell"></span><b></b></button><span class="avatar"><?= htmlspecialchars(strtoupper(substr($signedInUser['name'],0,1))) ?></span></header>
+    <header class="topbar"><button class="menu-toggle icon-btn" aria-label="Open menu">Menu</button><label class="search"><span aria-hidden="true">Search</span><input id="global-search" placeholder="Search records" aria-label="Search records"></label><span class="role-chip"><?= htmlspecialchars($signedInUser['role']) ?></span><button class="notification-button icon-btn" aria-label="Notifications"><span data-inline-icon="bell"></span></button><span class="avatar"><?= htmlspecialchars(strtoupper(substr($signedInUser['name'],0,1))) ?></span></header>
     <div class="content" id="app" aria-live="polite"></div>
   </main>
 </div>

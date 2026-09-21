@@ -1,15 +1,18 @@
 :root {
-  --navy: #0d1b31;
-  --ink: #17243a;
-  --muted: #6d788b;
-  --line: #e3e8f0;
-  --bg: #f3f6fa;
-  --brand: #5e5ce6;
-  --teal: #24a47b;
-  --rose: #dc5974;
-  --amber: #d89527;
+  --navy: #111827;
+  --ink: #18212f;
+  --muted: #667085;
+  --line: #e4e7ec;
+  --bg: #f6f7f9;
+  --brand: #2563eb;
+  --teal: #167a5b;
+  --rose: #b4233e;
+  --amber: #9a6700;
   --white: #fff;
-  --shadow: 0 10px 30px rgba(28, 42, 67, 0.07);
+  --shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
+  --focus: rgba(37, 99, 235, 0.18);
+  --surface: #fff;
+  --caret: #2563eb;
 }
 * {
   box-sizing: border-box;
@@ -49,11 +52,11 @@ body {
   border-radius: 12px;
   display: grid;
   place-items: center;
-  background: linear-gradient(145deg, #8484ff, #5150d5);
+  background: var(--brand);
   color: #fff;
   font-weight: 800;
   font-size: 20px;
-  box-shadow: 0 8px 20px #070e1e88;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
 }
 .brand strong,
 .brand small,
@@ -104,7 +107,7 @@ body {
   background: #ffffff12;
 }
 .nav-item.active {
-  box-shadow: inset 3px 0 #8585ff;
+  box-shadow: inset 1px 0 #60a5fa;
 }
 .nav-item i {
   width: 29px;
@@ -136,8 +139,8 @@ body {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: #ececff;
-  color: #5555c9;
+  background: #eff6ff;
+  color: #175cd3;
   font-weight: 750;
   font-size: 12px;
   flex: none;
@@ -190,8 +193,8 @@ main {
   font-size: 14px;
 }
 .search input:focus {
-  outline: 3px solid #5e5ce626;
-  border-color: #b8b8f7;
+  outline: 3px solid var(--focus);
+  border-color: #84adff;
 }
 .notification-button {
   margin-left: auto;
@@ -250,15 +253,27 @@ main {
   font-weight: 700;
   font-size: 13px;
   cursor: pointer;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+}
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 .button.primary {
   background: var(--brand);
   color: #fff;
-  box-shadow: 0 7px 16px #5e5ce62c;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+.button.primary:hover:not(:disabled) {
+  background: #1d4ed8;
 }
 .button.secondary {
   background: #f0f2f6;
   color: #526076;
+}
+.button.secondary:hover:not(:disabled) {
+  background: #e4e8ef;
 }
 .metrics {
   display: grid;
@@ -286,20 +301,20 @@ main {
   border-radius: 10px;
   display: grid;
   place-items: center;
-  background: #ececff;
-  color: #5b5bd8;
+  background: #eff6ff;
+  color: #2563eb;
 }
 .metric:nth-child(2) .metric-icon {
-  background: #e7f8f2;
-  color: var(--teal);
+  background: #eff6ff;
+  color: #2563eb;
 }
 .metric:nth-child(3) .metric-icon {
-  background: #fff4df;
-  color: var(--amber);
+  background: #eff6ff;
+  color: #2563eb;
 }
 .metric:nth-child(4) .metric-icon {
-  background: #ffebef;
-  color: var(--rose);
+  background: #eff6ff;
+  color: #2563eb;
 }
 .metric p {
   font-size: 13px;
@@ -351,7 +366,7 @@ main {
 .bar {
   width: min(48px, 70%);
   border-radius: 8px 8px 3px 3px;
-  background: linear-gradient(#7776ef, #5554d7);
+  background: #3b82f6;
   min-height: 8px;
 }
 .bar-wrap small {
@@ -376,15 +391,15 @@ main {
   cursor: pointer;
 }
 .quick-list button:hover {
-  border-color: #bfc0f4;
-  background: #f8f8ff;
+  border-color: #bfdbfe;
+  background: #f8fbff;
 }
 .quick-list span {
   width: 30px;
   height: 30px;
   border-radius: 8px;
-  background: #ededff;
-  color: #5e5ddd;
+  background: #eff6ff;
+  color: #2563eb;
   display: grid;
   place-items: center;
 }
@@ -502,8 +517,8 @@ td:first-child {
   border-radius: 99px;
   font-size: 11px;
   font-weight: 700;
-  background: #eef0ff;
-  color: #5758c9;
+  background: #eff6ff;
+  color: #175cd3;
 }
 .badge.Paid,
 .badge.Completed,
@@ -530,9 +545,31 @@ td:first-child {
   color: #bc3e58;
 }
 .empty {
-  padding: 50px;
+  padding: 50px 28px;
   text-align: center;
   color: var(--muted);
+}
+.empty-state h2 {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-size: 18px;
+  letter-spacing: -0.02em;
+}
+.empty-state p {
+  margin: 0 auto 18px;
+  max-width: 42ch;
+  line-height: 1.55;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 .row-actions button {
   border: 0;
@@ -768,13 +805,6 @@ dialog form {
   }
   .page-head h1 {
     font-size: 25px;
-  }
-  .page-head .button {
-    font-size: 0;
-  }
-  .page-head .button:after {
-    content: '+';
-    font-size: 20px;
   }
   .topbar > .avatar {
     display: none;
