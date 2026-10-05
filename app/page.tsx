@@ -36,7 +36,7 @@ export default function Home() {
   return (
     <div className="app-shell">
       <aside className={`sidebar ${mobileOpen ? 'sidebar-open' : ''}`}>
-        <div className="brand"><img className="brand-logo" src="/assets/logo-panel.png" alt="Launch It" width={220} height={141} /><button className="mobile-close" onClick={() => setMobileOpen(false)} aria-label="Close menu"><X /></button></div>
+        <div className="brand"><img className="brand-logo" src="/assets/logo-panel.png" alt="Launch It" width={176} height={48} /><button className="mobile-close" onClick={() => setMobileOpen(false)} aria-label="Close menu"><X /></button></div>
         <nav aria-label="Main navigation"><p className="nav-label">Workspace</p>
           {features.map(({ name, icon: Icon, color }) => <button key={name} onClick={() => choose(name)} className={`nav-item ${active === name ? 'active' : ''}`}><span className={`nav-icon ${color}`}><Icon size={17} /></span><span>{name}</span>{active === name && <ChevronRight className="nav-arrow" size={16} />}</button>)}
         </nav>

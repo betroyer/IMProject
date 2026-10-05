@@ -2,27 +2,28 @@
    Product modules and copy stay Startup:; chrome follows the soft light panel grammar. */
 
 :root {
-  --ink: #111827;
+  --ink: #152033;
   --muted: #6b7280;
   --line: #e8eaed;
-  --bg: #eef0f3;
+  --bg: #eef1f5;
   --surface: #ffffff;
-  --brand: #111827;
+  --brand: #0f1c33;
   --brand-soft: #f3f4f6;
-  --accent: #2563eb;
-  --teal: #167a5b;
+  --accent: #1f6fe5;
+  --teal: #0f9a8a;
   --rose: #b4233e;
   --amber: #9a6700;
-  --navy: #111827;
-  --shadow: 0 10px 30px rgba(17, 24, 39, 0.06);
-  --shadow-soft: 0 4px 14px rgba(17, 24, 39, 0.05);
-  --radius: 16px;
+  --navy: #0f1c33;
+  --shadow: 0 10px 28px rgba(15, 28, 51, 0.06);
+  --shadow-soft: 0 4px 14px rgba(15, 28, 51, 0.05);
+  --radius: 14px;
   --radius-sm: 12px;
   --radius-pill: 999px;
-  --focus: rgba(17, 24, 39, 0.18);
-  --caret: #111827;
-  --sidebar-w: 248px;
+  --focus: rgba(15, 28, 51, 0.16);
+  --caret: #0f1c33;
+  --sidebar-w: 252px;
   --rail-w: 300px;
+  --font: "Sora", "Segoe UI Variable Text", "Segoe UI", sans-serif;
 }
 
 ::selection {
@@ -40,7 +41,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: 'Segoe UI Variable Text', 'Segoe UI', sans-serif;
+  font-family: var(--font);
   line-height: 1.45;
 }
 
@@ -69,22 +70,24 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 4px 8px 28px;
+  gap: 10px;
+  padding: 2px 6px 26px;
   position: relative;
 }
 
 .brand-logo {
   display: block;
-  width: 100%;
-  max-width: 206px;
+  width: auto;
+  max-width: 176px;
+  max-height: 48px;
   height: auto;
-  border-radius: 10px;
+  border-radius: 0;
   background: transparent;
   box-shadow: none;
   border: 0;
   padding: 0;
   object-fit: contain;
+  object-position: left center;
 }
 
 .nav-label {
@@ -147,7 +150,7 @@ body {
 }
 
 .nav-item.active {
-  background: #111827;
+  background: var(--navy);
   color: #fff;
   box-shadow: none;
 }
@@ -202,18 +205,18 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
+  min-height: 42px;
   border-radius: var(--radius-pill);
-  background: #111827;
+  background: var(--navy);
   color: #fff;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 650;
   text-decoration: none;
   transition: background-color 0.15s ease, transform 0.15s ease;
 }
 
 .sign-out-btn:hover {
-  background: #000;
+  background: #081225;
 }
 
 .sign-out-btn:focus-visible {

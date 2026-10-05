@@ -87,11 +87,8 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
     <section class="auth-brand" aria-label="Launch It">
       <div class="auth-brand-inner">
         <p class="welcome-line">Welcome to</p>
-        <img class="brand-logo" src="assets/logo-panel.png" alt="Launch It" width="240" height="154">
+        <img class="brand-logo brand-logo--full" src="assets/logo.png" alt="Launch It" width="220" height="220">
         <p class="brand-copy">This one-time setup is disabled after an administrator has been created.</p>
-      </div>
-      <div class="auth-wave" aria-hidden="true">
-        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
       </div>
       <p class="brand-foot">Administrator setup</p>
     </section>
@@ -102,9 +99,9 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
           <p>Use an account only you control.</p>
         </header>
         <?php if ($error): ?><div class="error" role="alert"><?= htmlspecialchars($error) ?></div><?php endif; ?>
-        <label class="field"><span>Full name</span><span class="field-control"><input name="name" required autocomplete="name" placeholder="Enter your name"><svg class="field-check" viewBox="0 0 20 20" aria-hidden="true"><path d="M7.8 13.2 4.6 10l-1.2 1.2 4.4 4.4L16.6 6.8 15.4 5.6z"/></svg></span></label>
-        <label class="field"><span>Email address</span><span class="field-control"><input type="email" name="email" required autocomplete="email" placeholder="Enter your email"><svg class="field-check" viewBox="0 0 20 20" aria-hidden="true"><path d="M7.8 13.2 4.6 10l-1.2 1.2 4.4 4.4L16.6 6.8 15.4 5.6z"/></svg></span></label>
-        <label class="field"><span>Password</span><span class="field-control"><input type="password" name="password" required minlength="10" autocomplete="new-password" placeholder="At least 10 characters"><svg class="field-check" viewBox="0 0 20 20" aria-hidden="true"><path d="M7.8 13.2 4.6 10l-1.2 1.2 4.4 4.4L16.6 6.8 15.4 5.6z"/></svg></span></label>
+        <label class="field"><span>Full name</span><span class="field-control"><input name="name" required autocomplete="name" placeholder="Enter your name"></span></label>
+        <label class="field"><span>Email address</span><span class="field-control"><input type="email" name="email" required autocomplete="email" placeholder="Enter your email"></span></label>
+        <label class="field"><span>Password</span><span class="field-control"><input type="password" name="password" required minlength="10" autocomplete="new-password" placeholder="At least 10 characters"></span></label>
         <div class="auth-actions">
           <button type="submit" class="btn-primary">Create administrator</button>
         </div>

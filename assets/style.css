@@ -1,28 +1,30 @@
 :root {
-  --navy: #111827;
-  --ink: #18212f;
-  --muted: #667085;
-  --line: #e4e7ec;
-  --bg: #f6f7f9;
-  --brand: #2563eb;
-  --teal: #167a5b;
+  --navy: #0f1c33;
+  --ink: #152033;
+  --muted: #6b7280;
+  --line: #e6e9ef;
+  --bg: #eef1f5;
+  --brand: #0f1c33;
+  --accent: #1f6fe5;
+  --teal: #0f9a8a;
   --rose: #b4233e;
   --amber: #9a6700;
   --white: #fff;
-  --shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
-  --focus: rgba(37, 99, 235, 0.18);
+  --shadow: 0 8px 24px rgba(15, 28, 51, 0.06);
+  --focus: rgba(15, 28, 51, 0.16);
   --surface: #fff;
-  --caret: #2563eb;
+  --caret: #0f1c33;
+  --font: "Sora", "Segoe UI Variable Text", "Segoe UI", sans-serif;
 }
 * {
   box-sizing: border-box;
 }
 body {
   margin: 0;
-  font-family: 'Segoe UI Variable Text', 'Segoe UI', sans-serif;
+  font-family: var(--font);
   background: var(--bg);
   color: var(--ink);
-  font-size: 16px;
+  font-size: 15px;
 }
 .app-shell {
   min-height: 100vh;
@@ -31,10 +33,11 @@ body {
 .sidebar {
   position: fixed;
   inset: 0 auto 0 0;
-  width: 275px;
-  background: var(--navy);
-  padding: 23px 15px 18px;
-  color: #c2ccdc;
+  width: 252px;
+  background: #f7f8fa;
+  padding: 22px 14px 16px;
+  color: var(--ink);
+  border-right: 1px solid #e7e9ee;
   z-index: 20;
   display: flex;
   flex-direction: column;
@@ -44,20 +47,22 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 11px;
-  padding: 0 8px 24px;
+  gap: 10px;
+  padding: 2px 6px 22px;
   position: relative;
 }
 .brand-logo {
   display: block;
-  width: 100%;
-  max-width: 210px;
+  width: auto;
+  max-width: 176px;
+  max-height: 48px;
   height: auto;
-  border-radius: 12px;
-  background: #fff;
-  padding: 8px 10px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
   object-fit: contain;
+  object-position: left center;
 }
 .profile strong,
 .profile small {
@@ -65,60 +70,66 @@ body {
 }
 .nav-label,
 .eyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 11px;
-  font-weight: 750;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12px;
+  font-weight: 650;
 }
 .nav-label {
-  color: #657690;
+  color: #9aa3b2;
   padding: 0 12px;
-  margin: 0 0 7px;
+  margin: 0 0 8px;
 }
 .nav-item {
   width: 100%;
-  min-height: 43px;
+  min-height: 42px;
   border: 0;
   background: transparent;
-  color: #b8c4d5;
-  border-radius: 10px;
-  padding: 7px 10px;
+  color: #1f2937;
+  border-radius: 999px;
+  padding: 8px 12px;
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 12px;
   text-align: left;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 550;
   line-height: 1.2;
-  margin: 1px 0;
+  margin: 2px 0;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
-.nav-item:hover,
+.nav-item:hover {
+  color: var(--ink);
+  background: #eef0f4;
+}
 .nav-item.active {
   color: #fff;
-  background: #ffffff12;
-}
-.nav-item.active {
-  box-shadow: inset 1px 0 #60a5fa;
+  background: var(--navy);
+  box-shadow: none;
 }
 .nav-item i {
-  width: 29px;
-  height: 29px;
-  border-radius: 8px;
-  background: #57c49a1c;
-  color: #7ad9b4;
+  width: 22px;
+  height: 22px;
+  border-radius: 0;
+  background: transparent;
+  color: #6b7280;
   display: grid;
   place-items: center;
   font-style: normal;
   flex: none;
 }
+.nav-item.active i {
+  color: #fff;
+}
 .nav-item:nth-child(4n) i,
 .nav-item:nth-child(4n + 3) i {
-  background: #e76d8c1b;
-  color: #ef91aa;
+  background: transparent;
+  color: inherit;
 }
 .profile {
   margin-top: auto;
-  border-top: 1px solid #ffffff14;
+  border-top: 1px solid #e7e9ee;
   padding: 17px 8px 0;
   display: flex;
   align-items: center;
@@ -130,23 +141,23 @@ body {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: #eff6ff;
-  color: #175cd3;
+  background: #eef0f4;
+  color: var(--navy);
   font-weight: 750;
   font-size: 12px;
   flex: none;
 }
 .profile strong {
-  color: #fff;
-  font-size: 12px;
+  color: var(--ink);
+  font-size: 13px;
 }
 .profile small {
-  color: #8292aa;
-  font-size: 10px;
+  color: var(--muted);
+  font-size: 11px;
   margin-top: 2px;
 }
 main {
-  margin-left: 275px;
+  margin-left: 252px;
   min-width: 0;
   flex: 1;
 }

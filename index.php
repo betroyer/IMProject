@@ -4,7 +4,10 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="A complete workspace for startup operations.">
   <title>Launch It</title>
-  <link rel="icon" href="assets/logo.png" type="image/png">
+  <link rel="icon" href="assets/logo-panel.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css?v=<?= filemtime(__DIR__.'/assets/style.css') ?>">
   <link rel="stylesheet" href="assets/polish.css?v=<?= filemtime(__DIR__.'/assets/polish.css') ?>">
   <link rel="stylesheet" href="assets/client-panel.css?v=<?= filemtime(__DIR__.'/assets/client-panel.css') ?>">
@@ -13,7 +16,7 @@
 <div class="app-shell">
   <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <img class="brand-logo" src="assets/logo-panel.png" alt="Launch It" width="220" height="141">
+      <img class="brand-logo" src="assets/logo-panel.png" alt="Launch It" width="176" height="48">
       <button class="close-menu icon-btn" aria-label="Close menu">×</button>
     </div>
     <nav id="navigation" aria-label="Main navigation">

@@ -78,11 +78,8 @@ $cssVersion = filemtime(__DIR__ . '/assets/login.css');
     <section class="auth-brand" aria-label="Launch It">
       <div class="auth-brand-inner">
         <p class="welcome-line">Welcome to</p>
-        <img class="brand-logo" src="assets/logo-panel.png" alt="Launch It" width="240" height="154">
+        <img class="brand-logo brand-logo--full" src="assets/logo.png" alt="Launch It" width="220" height="220">
         <p class="brand-copy">Create your client workspace and keep planning, accounting, notifications, and support in one place.</p>
-      </div>
-      <div class="auth-wave" aria-hidden="true">
-        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
       </div>
       <p class="brand-foot">Client accounts stay separate by organization</p>
     </section>
@@ -96,17 +93,17 @@ $cssVersion = filemtime(__DIR__ . '/assets/login.css');
         <?php if ($error): ?><div class="error" role="alert"><?= htmlspecialchars($error) ?></div><?php endif; ?>
         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['signup_csrf']) ?>">
         <div class="field-grid">
-          <label class="field"><span>Full name</span><span class="field-control"><input name="name" value="<?= old_value($values,'name') ?>" autocomplete="name" required autofocus placeholder="Enter your name"><svg class="field-check" viewBox="0 0 20 20" aria-hidden="true"><path d="M7.8 13.2 4.6 10l-1.2 1.2 4.4 4.4L16.6 6.8 15.4 5.6z"/></svg></span></label>
-          <label class="field"><span>Business name</span><span class="field-control"><input name="business_name" value="<?= old_value($values,'business_name') ?>" autocomplete="organization" required placeholder="Enter business name"><svg class="field-check" viewBox="0 0 20 20" aria-hidden="true"><path d="M7.8 13.2 4.6 10l-1.2 1.2 4.4 4.4L16.6 6.8 15.4 5.6z"/></svg></span></label>
+          <label class="field"><span>Full name</span><span class="field-control"><input name="name" value="<?= old_value($values,'name') ?>" autocomplete="name" required autofocus placeholder="Enter your name"></span></label>
+          <label class="field"><span>Business name</span><span class="field-control"><input name="business_name" value="<?= old_value($values,'business_name') ?>" autocomplete="organization" required placeholder="Enter business name"></span></label>
         </div>
-        <label class="field"><span>Email address</span><span class="field-control"><input type="email" name="email" value="<?= old_value($values,'email') ?>" autocomplete="email" required placeholder="Enter your email"><svg class="field-check" viewBox="0 0 20 20" aria-hidden="true"><path d="M7.8 13.2 4.6 10l-1.2 1.2 4.4 4.4L16.6 6.8 15.4 5.6z"/></svg></span></label>
+        <label class="field"><span>Email address</span><span class="field-control"><input type="email" name="email" value="<?= old_value($values,'email') ?>" autocomplete="email" required placeholder="Enter your email"></span></label>
         <div class="field-grid">
-          <label class="field"><span>Password</span><span class="field-control"><input type="password" name="password" autocomplete="new-password" minlength="10" required placeholder="At least 10 characters"><svg class="field-check" viewBox="0 0 20 20" aria-hidden="true"><path d="M7.8 13.2 4.6 10l-1.2 1.2 4.4 4.4L16.6 6.8 15.4 5.6z"/></svg></span></label>
-          <label class="field"><span>Confirm password</span><span class="field-control"><input type="password" name="password_confirmation" autocomplete="new-password" minlength="10" required placeholder="Re-enter password"><svg class="field-check" viewBox="0 0 20 20" aria-hidden="true"><path d="M7.8 13.2 4.6 10l-1.2 1.2 4.4 4.4L16.6 6.8 15.4 5.6z"/></svg></span></label>
+          <label class="field"><span>Password</span><span class="field-control"><input type="password" name="password" autocomplete="new-password" minlength="10" required placeholder="At least 10 characters"></span></label>
+          <label class="field"><span>Confirm password</span><span class="field-control"><input type="password" name="password_confirmation" autocomplete="new-password" minlength="10" required placeholder="Re-enter password"></span></label>
         </div>
         <p class="privacy-note">Use at least 10 characters. Your account will only access information stored for your business.</p>
         <div class="auth-actions">
-          <button type="submit" class="btn-primary">Sign up</button>
+          <button type="submit" class="btn-primary">Create account</button>
           <a class="btn-secondary" href="login.php">Sign in</a>
         </div>
       </form>
