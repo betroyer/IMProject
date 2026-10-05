@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="A complete workspace for startup operations.">
-  <title>Startup:business management system</title>
+  <title>Launch It</title>
+  <link rel="icon" href="assets/logo.png" type="image/png">
   <link rel="stylesheet" href="assets/style.css?v=<?= filemtime(__DIR__.'/assets/style.css') ?>">
   <link rel="stylesheet" href="assets/polish.css?v=<?= filemtime(__DIR__.'/assets/polish.css') ?>">
   <link rel="stylesheet" href="assets/client-panel.css?v=<?= filemtime(__DIR__.'/assets/client-panel.css') ?>">
@@ -12,8 +13,7 @@
 <div class="app-shell">
   <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <span class="brand-mark" aria-hidden="true">S</span>
-      <div><strong>Startup:</strong><small>business management system</small></div>
+      <img class="brand-logo" src="assets/logo-panel.png" alt="Launch It" width="220" height="141">
       <button class="close-menu icon-btn" aria-label="Close menu">×</button>
     </div>
     <nav id="navigation" aria-label="Main navigation">

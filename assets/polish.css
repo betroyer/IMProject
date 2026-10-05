@@ -37,13 +37,9 @@ body {
 .brand {
   padding: 0 8px 25px;
 }
-.brand-mark {
-  background: #2563eb;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
-}
-.brand small {
-  font-size: 11px;
-  letter-spacing: 0.01em;
+.brand-logo {
+  max-width: 210px;
+  border-radius: 12px;
 }
 .nav-group {
   margin-top: 20px;

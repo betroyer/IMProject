@@ -70,4 +70,47 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
     }
   }
 }
-?><!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Create administrator</title><link rel="stylesheet" href="assets/login.css"></head><body><main class="login-shell"><section class="login-intro"><div class="brand"><span>S</span><div><strong>Startup:</strong><small>business management system</small></div></div><div><h1>Create the first administrator.</h1><p>This one-time setup is disabled after an administrator has been created.</p></div></section><section class="login-panel"><form method="post"><header><h2>Administrator setup</h2><p>Use an account only you control.</p></header><?php if($error):?><div class="error" role="alert"><?=htmlspecialchars($error)?></div><?php endif;?><label>Full name<input name="name" required autocomplete="name"></label><label>Email address<input type="email" name="email" required autocomplete="email"></label><label>Password<input type="password" name="password" required minlength="10" autocomplete="new-password"></label><button>Create administrator</button></form></section></main></body></html>
+?><!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Create administrator — Launch It</title>
+  <link rel="icon" href="assets/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/login.css?v=<?= filemtime(__DIR__.'/assets/login.css') ?>">
+</head>
+<body>
+<main class="auth-page">
+  <div class="auth-card">
+    <section class="auth-brand" aria-label="Launch It">
+      <div class="auth-brand-inner">
+        <p class="welcome-line">Welcome to</p>
+        <img class="brand-logo" src="assets/logo-panel.png" alt="Launch It" width="240" height="154">
+        <p class="brand-copy">This one-time setup is disabled after an administrator has been created.</p>
+      </div>
+      <div class="auth-wave" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <p class="brand-foot">Administrator setup</p>
+    </section>
+    <section class="auth-panel">
+      <form method="post" class="auth-form">
+        <header>
+          <h1>Create administrator</h1>
+          <p>Use an account only you control.</p>
+        </header>
+        <?php if ($error): ?><div class="error" role="alert"><?= htmlspecialchars($error) ?></div><?php endif; ?>
+        <label class="field"><span>Full name</span><span class="field-control"><input name="name" required autocomplete="name" placeholder="Enter your name"><svg class="field-check" viewBox="0 0 20 20" aria-hidden="true"><path d="M7.8 13.2 4.6 10l-1.2 1.2 4.4 4.4L16.6 6.8 15.4 5.6z"/></svg></span></label>
+        <label class="field"><span>Email address</span><span class="field-control"><input type="email" name="email" required autocomplete="email" placeholder="Enter your email"><svg class="field-check" viewBox="0 0 20 20" aria-hidden="true"><path d="M7.8 13.2 4.6 10l-1.2 1.2 4.4 4.4L16.6 6.8 15.4 5.6z"/></svg></span></label>
+        <label class="field"><span>Password</span><span class="field-control"><input type="password" name="password" required minlength="10" autocomplete="new-password" placeholder="At least 10 characters"><svg class="field-check" viewBox="0 0 20 20" aria-hidden="true"><path d="M7.8 13.2 4.6 10l-1.2 1.2 4.4 4.4L16.6 6.8 15.4 5.6z"/></svg></span></label>
+        <div class="auth-actions">
+          <button type="submit" class="btn-primary">Create administrator</button>
+        </div>
+      </form>
+    </section>
+  </div>
+</main>
+</body>
+</html>

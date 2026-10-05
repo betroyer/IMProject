@@ -43,34 +43,25 @@ body {
 .brand {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 11px;
   padding: 0 8px 24px;
+  position: relative;
 }
-.brand-mark {
-  width: 40px;
-  height: 40px;
+.brand-logo {
+  display: block;
+  width: 100%;
+  max-width: 210px;
+  height: auto;
   border-radius: 12px;
-  display: grid;
-  place-items: center;
-  background: var(--brand);
-  color: #fff;
-  font-weight: 800;
-  font-size: 20px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+  background: #fff;
+  padding: 8px 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  object-fit: contain;
 }
-.brand strong,
-.brand small,
 .profile strong,
 .profile small {
   display: block;
-}
-.brand strong {
-  font-size: 18px;
-  color: #fff;
-}
-.brand small {
-  font-size: 10px;
-  color: #91a0b7;
 }
 .nav-label,
 .eyebrow {
